@@ -19,13 +19,18 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-app.get("/",function (req,res) {
-
-      var time = []
-      var count = []
- res.render("home",{time:time,count:count})
-    
+app.get("/api/:collection/:in/:of",function (req,res) {
+  Record.aggregate([{$match:{[req.params.in] : req.params.of}},
+      {$group:{ 
+            _id : "$"+req.params.collection,
+             total : {$sum : 1}}},
+             {$sort: {_id: 1}}])
+             .exec((err,data) => {
+            if (err) {console.log(err)}
+            res.json(data)
+     })
 })
+
 
 app.get("/lineChart/:type",function (req,res) {
   Record.aggregate([
@@ -59,46 +64,19 @@ app.get("/lineChart/:type",function (req,res) {
 })
 
 
-app.get("/recordForm",function (req,res) {
- res.render("recordForm")
+
+
+app.get("/",function (req,res) {
+
+  var time = []
+  var count = []
+res.render("home",{time:time,count:count})
+
 })
-
-
-// db.getCollection('records').aggregate([
-//   {$group : 
-//       { _id : "$gender",
-//           total : {$sum : 1}
-//           }
-//       }])
-
-
-  // Record.aggregate([
-  //   {$match: {type: "visitor"}},
-  //   {$group:{ 
-  //     _id : "$arrivedAt",
-  //     total : {$sum : 1}
-  //     }},{$sort: {_id: 1}}
-  //     ]).exec((err,data) => {
-  //           if (err) {console.log(err)} 
-               
-  //             var arr1 = [];
-  //             var arr2 = [];
-
-  //             data.forEach(function(e){
-  //                 arr1.push(e._id)
-  //                 arr2.push(e.total)
-  //             })
-  //             var result = arr1.map((cur, idx) => [cur, arr2[idx]]);
-  //             console.log(result);
-      
-  //       })
 
 
 
 app.post("/addRecord",function (req,res) {
-
-	
-
 
  var newRecord = {
  	type:req.body.type,
@@ -125,24 +103,8 @@ res.redirect("back")
 
 
 
-app.get("/:region",function (req,res) {
-    
-   Record.find({"regionName":req.params.region},function (err,records) {
-      if (err) {
-      	console.log(err)
-      } else {
-
-     
-
-         res.json(records)
-      }
-   })
-})
 
 
-
-
-
-app.listen(3000, function() {
+app.listen(3001, function() {
   console.log('Server started');
 });

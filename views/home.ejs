@@ -35,7 +35,7 @@
 }
 
 #chart_div:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.200), 0 10px 10px rgba(0,0,0,0.22);
+  box-shadow: 0 4px 8px rgba(0,0,0,0), 0 0px 0px rgba(0,0,0,0);
   
 }
 
@@ -558,7 +558,7 @@
                
                
                 <!-- sidebar-search  -->
-                <div class="sidebar-menu">
+                <div class="sidebar-menu" style="text-align:center">
                     <ul>
                         <li class="header-menu">
                             <span>General</span>
@@ -584,41 +584,28 @@
                             <li class="header-menu">
                               <span>Line charts</span>
                           </li>
-                          <li>
-                              <a href="/lineChart/customer">
-                                  <i class="fa fa-user"></i>
-                                  <span>Customer</span>
-                              </a>
-                          </li>
-                          <li>
-                              <a href="/lineChart/visitor">
-                                  <i class="fa fa-user"></i>
-                                  <span>Visitor</span>
-                              </a>
-                          </li>
+                          <div class="btn-group-vertical">
+                              <button id="lineChartCustomer" type="button" class="btn btn-secondary">Customer</button>
+                              <button id="lineChartVisitor" type="button" class="btn btn-primary">Visitor</button>
+                              
+                              
+                            </div>
+
+                            <li class="header-menu">
+                                <span>Pie charts</span>
+                            </li>
+                            <div class="btn-group-vertical">
+                                <button id="pieChartCustomer" type="button" class="btn btn-secondary">Customer</button>
+                                <button id="pieChartVisitor" type="button" class="btn btn-primary">Visitor</button>
+                                
+                                
+                              </div>
               
                     </ul>
                 </div>
                 <!-- sidebar-menu  -->
             </div>
-            <!-- sidebar-content  -->
-            <!-- <div class="sidebar-footer">
-                <a href="#">
-                    <i class="fa fa-bell"></i>
-                    <span class="badge badge-pill badge-warning notification">3</span>
-                </a>
-                <a href="#">
-                    <i class="fa fa-envelope"></i>
-                    <span class="badge badge-pill badge-success notification">7</span>
-                </a>
-                <a href="#">
-                    <i class="fa fa-cog"></i>
-                    <span class="badge-sonar"></span>
-                </a>
-                <a href="#">
-                    <i class="fa fa-power-off"></i>
-                </a>
-            </div> -->
+        
         </nav>
         <!-- sidebar-wrapper  -->
         <main class="page-content">
@@ -626,8 +613,8 @@
               
          <div id="section1" class="container-fluid">
            <div class="row">
-             <div class="col-lg-8" id="chart_div" ></div>
-             <div class="col-lg-4" ></div>
+             <div class="col-lg-12" id="chart_div" ></div>
+             <div class="col-lg-12" > <div id="piechart" style="width: 900px; height: 500px;"></div></div>
            </div>
                 
          </div>
@@ -665,21 +652,150 @@
     
 </body>
 
+<style>
+  .this{
+    display: none;
+  }
+</style>
 
 <script>
-  function openCity(evt, cityName) {
-  var i, x, tablinks;
-  x = document.getElementsByClassName("city");
-  for (i = 0; i < x.length; i++) {
-      x[i].style.display = "none";
+
+   $("#pieChartCustomer").on("click", function(){
+     $("#chart_div").toggleClass("this")
+      fetch("http://localhost:3001/api/gender/type/customer")
+      .then(response => response.json()
+      .then(function (doc) {
+        
+        var time = ["gender"];
+        var count = ["total"];
+
+
+
+         doc.forEach(function(e){
+                time.push(e._id)
+                count.push(e.total)
+              })
+ 
+var result = time.map((cur, idx) => [cur, count[idx]]);
+console.log(result);
+
+
+google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+    var data = google.visualization.arrayToDataTable(result);
+
+    var options = {
+      title: 'My Daily Activities'
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
   }
-  tablinks = document.getElementsByClassName("tablink");
-  for (i = 0; i < x.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
-  }
-  document.getElementById(cityName).style.display = "block";
-  evt.currentTarget.className += " w3-red";
-}
+  
+    
+                     
+      })
+    )
+  })
+
+
+
+    $("#lineChartCustomer").on("click", function(){
+      $("#pieChart").toggleClass("this")
+      fetch("http://localhost:3001/api/arrivedAt/type/customer")
+      .then(response => response.json()
+      .then(function (data) {
+        
+        var time = [];
+        var count = [];
+
+              data.forEach(function(e){
+                time.push(e._id)
+                count.push(e.total)
+              })
+
+        var result = time.map((cur, idx) => [cur, count[idx]]);
+      
+        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.setOnLoadCallback(drawBackgroundColor);
+
+        function drawBackgroundColor() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'min');
+      data.addColumn('number', 'Customers');
+
+      data.addRows(result);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Analysis'
+        },
+        backgroundColor: 'white'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+            
+      })
+    )
+  })
+    
+    
+  $("#lineChartVisitor").on("click", function(){
+    $("#pieChart").toggleClass("this")
+      fetch("http://localhost:3001/api/arrivedAt/type/visitor")
+      .then(response => response.json()
+      .then(function (data) {
+        
+        var time = [];
+        var count = [];
+
+              data.forEach(function(e){
+                time.push(e._id)
+                count.push(e.total)
+              })
+
+        var result = time.map((cur, idx) => [cur, count[idx]]);
+      
+        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.setOnLoadCallback(drawBackgroundColor);
+
+        function drawBackgroundColor() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'min');
+      data.addColumn('number', 'Visitors');
+
+      data.addRows(result);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Analysis'
+        },
+        backgroundColor: 'white'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+            
+      })
+    )
+  })
+    
+
 </script>
 
 
@@ -720,44 +836,8 @@ $("#show-sidebar").click(function() {
 $(".page-wrapper").addClass("toggled");
 });
 
-
-
-
 });
 
-
-google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawBackgroundColor);
-
-var timeString = '<%=time%>';
-var countString = '<%=count%>';
-
-var time = timeString.split(',').map(Number);
-var count = countString.split(',').map(Number);
-
-var result = time.map((cur, idx) => [cur, count[idx]]);
-
-
-function drawBackgroundColor() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('number', 'min');
-      data.addColumn('number', 'Customers');
-
-      data.addRows(result);
-
-      var options = {
-        hAxis: {
-          title: 'Time'
-        },
-        vAxis: {
-          title: 'Analysis'
-        },
-        backgroundColor: 'white'
-      };
-
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
    
 </script>
 
