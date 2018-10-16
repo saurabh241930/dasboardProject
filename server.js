@@ -32,37 +32,6 @@ app.get("/api/:collection/:in/:of",function (req,res) {
 })
 
 
-app.get("/lineChart/:type",function (req,res) {
-  Record.aggregate([
-    {
-      $match: 
-      {type: req.params.type}
-    },
-      {
-         $group:{ 
-            _id : "$arrivedAt",
-             total : {$sum : 1}
-        }
-      },{
-      $sort: {_id: 1}
-    }
-      ]).exec((err,data) => {
-            if (err) {console.log(err)} 
-               
-              var time = [];
-              var count = [];
-
-              data.forEach(function(e){
-                time.push(e._id)
-                count.push(e.total)
-              })
-            
-              res.render("home",{time:time,count:count})
-      
-        })
- 
-})
-
 
 
 
