@@ -29,11 +29,18 @@ app.get("/",function (req,res) {
 
 app.get("/lineChart/:type",function (req,res) {
   Record.aggregate([
-    {$match: {type: req.params.type}},
-    {$group:{ 
-      _id : "$arrivedAt",
-      total : {$sum : 1}
-      }},{$sort: {_id: 1}}
+    {
+      $match: 
+      {type: req.params.type}
+    },
+      {
+         $group:{ 
+            _id : "$arrivedAt",
+             total : {$sum : 1}
+        }
+      },{
+      $sort: {_id: 1}
+    }
       ]).exec((err,data) => {
             if (err) {console.log(err)} 
                
