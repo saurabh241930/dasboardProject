@@ -1,8 +1,8 @@
-"# dasboardProject" 
+# dasboardProject
 
 to use api
 
-`**/api/(specify collection)/(specify category)/(sub category)**`
+**`/api/(specify collection)/(specify category)/(sub category)`**
 
 **Model Structure**
 
