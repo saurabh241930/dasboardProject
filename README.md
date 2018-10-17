@@ -18,7 +18,11 @@ var RecordSchema = new mongoose.Schema({
 })
 ```
 
-**Example**
+**usage**
+
+ | API                                         | Description|
+ |---------------                              | -----------|
+ | **`/api/gender/type/customer`**             | collection of customers based on their gender|
 
 suppose you want a collection of customers based on their gender
 
