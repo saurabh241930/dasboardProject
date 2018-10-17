@@ -25,8 +25,20 @@ to use api
  | **`/api/timeSpent/gender/female`**          | collection of time spent by females|
 
 
-
-
+API code
+```javascript
+router.get("/api/:collection/:in/:of",function (req,res) {
+  Record.aggregate([{$match:{[req.params.in] : req.params.of}},
+      {$group:{ 
+            _id : "$"+req.params.collection,
+             total : {$sum : 1}}},
+             {$sort: {_id: 1}}])
+             .exec((err,data) => {
+            if (err) {console.log(err)}
+            res.json(data)
+     })
+})
+```
 
 
 **Model Structure**
