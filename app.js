@@ -5,16 +5,25 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var  mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-
-var indexRouter = require('./routes/index');
-
+var app = express();
 var Record = require('./models/Record');
+
+var io = require('socket.io').listen(app.listen(3000));
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/dasboard',{ useNewUrlParser: true });
 
+io.sockets.on('connection', function (socket) {
+  console.log('client connect');
+  socket.on('echo', function (data) {
+  io.sockets.emit('message', data);
+});
+});
 
-var app = express();
+require('./routes/index')(app,io);
+
+console.log("Server listening at port 3000");
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,8 +35,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: true}));
-
-app.use('/', indexRouter);
 
 
 // catch 404 and forward to error handler
